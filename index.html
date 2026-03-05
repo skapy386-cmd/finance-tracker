@@ -261,7 +261,7 @@ cursor:pointer;
 
 <script>
 
-let data=JSON.parse(localStorage.getItem("finance"))||{}
+let data = {}
 let editIndex=null
 
 const incomeCats=[
@@ -302,7 +302,36 @@ function monthNow(){
 let d=new Date()
 return d.getFullYear()+"-"+(d.getMonth()+1)
 }
+async function loadFromDB(){
 
+const { data: rows, error } = await supabaseClient
+.from("transactions")
+.select("*")
+
+if(error){
+console.log(error)
+return
+}
+
+data = {}
+
+rows.forEach(t=>{
+
+if(!data[t.month]) data[t.month]=[]
+
+data[t.month].push({
+type:t.type,
+cat:t.cat,
+note:t.note,
+amount:t.amount,
+date:t.date
+})
+
+})
+
+loadMonths()
+
+}
 function loadMonths(){
 
 let select=document.getElementById("month")
@@ -347,8 +376,20 @@ editIndex=null
 }else{
 data[m].unshift({type,cat,note,amount,date})
 }
+await supabaseClient
+.from("transactions")
+.insert([
+{
+month:m,
+type:type,
+cat:cat,
+note:note,
+amount:amount,
+date:date
+}
+])
 
-localStorage.setItem("finance",JSON.stringify(data))
+
 
 document.getElementById("amount").value=""
 document.getElementById("note").value=""
@@ -380,7 +421,7 @@ let m=document.getElementById("month").value
 
 data[m].splice(i,1)
 
-localStorage.setItem("finance",JSON.stringify(data))
+
 
 render()
 
@@ -530,11 +571,12 @@ document.getElementById("month").addEventListener("change",render)
 <script src="script.js"></script>
 
 <script>
-loadMonths();
+loadFromDB();
 </script>
 
 </body>
 </html>
+
 
 
 
