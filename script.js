@@ -1,3 +1,8 @@
+const supabaseClient = supabase.createClient(
+"https://mhssctiyqzvycoyganct.supabase.co",
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1oc3NjdGl5cXp2eWNveWdhbmN0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3NDM4MTMsImV4cCI6MjA4ODMxOTgxM30.xOriQ-w57-67992R9CUkxEYnyCDJkgzUCOMWFwDxXLo"
+);
+
 let transactions = JSON.parse(localStorage.getItem("transactions")) || []
 let categories = JSON.parse(localStorage.getItem("categories")) || ["Food","Transport","Other"]
 
@@ -19,7 +24,15 @@ option.textContent = cat
 categorySelect.appendChild(option)
 })
 }
+async function loadTransactions(){
 
+const { data } = await supabaseClient
+.from("transactions")
+.select("*")
+
+console.log(data)
+
+}
 function renderTransactions(){
 list.innerHTML = ""
 
