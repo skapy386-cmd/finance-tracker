@@ -258,12 +258,13 @@ cursor:pointer;
 </div>
 
 </div>
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script src="script.js"></script>
 <script>
 
 const supabaseClient = supabase.createClient(
-"ВАШ_SUPABASE_URL",
-"ВАШ_PUBLIC_KEY"
+"https://mhssctiyqzvycoyganct.supabase.co",
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1oc3NjdGl5cXp2eWNveWdhbmN0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3NDM4MTMsImV4cCI6MjA4ODMxOTgxM30.xOriQ-w57-67992R9CUkxEYnyCDJkgzUCOMWFwDxXLo"
 )
 
 let data={}
@@ -490,15 +491,11 @@ document.getElementById("month").addEventListener("change",render)
 loadFromDB()
 
 </script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-<script src="script.js"></script>
 
-<script>
-loadFromDB();
-</script>
 
 </body>
 </html>
+
 
 
 
