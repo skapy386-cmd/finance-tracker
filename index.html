@@ -141,17 +141,6 @@ cursor:pointer;
 
 <body>
 
-<div id="authBox" style="max-width:400px;margin:40px auto;background:#1e293b;padding:20px;border-radius:12px">
-
-<h2>Вход</h2>
-
-<input id="email" placeholder="Email" style="width:100%;margin-bottom:10px;padding:10px">
-<input id="password" type="password" placeholder="Пароль" style="width:100%;margin-bottom:10px;padding:10px">
-
-<button onclick="login()" style="width:100%;margin-bottom:10px">Войти</button>
-<button onclick="signUp()" style="width:100%">Регистрация</button>
-
-</div>
 
 <div class="container">
 
@@ -272,53 +261,7 @@ cursor:pointer;
 
 </div>
 
-<script>
 
-const SUPABASE_URL = "https://mhssctiyqzvycoyganct.supabase.co"
-const SUPABASE_KEY = "sb_publishable_mo1MEJUS_Fzr87489I1_Sw_PjouHpXH"
-
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
-
-async function signUp(){
-
-let email=document.getElementById("email").value
-let password=document.getElementById("password").value
-
-let {error}=await supabase.auth.signUp({email,password})
-
-if(error) alert(error.message)
-else alert("Аккаунт создан")
-
-}
-
-async function login(){
-
-let email=document.getElementById("email").value
-let password=document.getElementById("password").value
-
-let {error}=await supabase.auth.signInWithPassword({email,password})
-
-if(error){
-alert(error.message)
-}else{
-location.reload()
-}
-
-}
-
-async function checkAuth(){
-
-let {data}=await supabase.auth.getSession()
-
-if(data.session){
-document.getElementById("authBox").style.display="none"
-}else{
-document.getElementById("mainTab").style.display="none"
-}
-
-}
-
-checkAuth()
 
 let data=JSON.parse(localStorage.getItem("finance"))||{}
 let editIndex=null
@@ -592,5 +535,6 @@ loadMonths()
 </script>
 </body>
 </html>
+
 
 
