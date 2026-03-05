@@ -324,20 +324,7 @@ data[t.month].push(t)
 loadMonths()
 
 }
-function showTab(tab){
 
-document.getElementById("mainTab").style.display =
-tab==="main" ? "block":"none"
-
-document.getElementById("statsTab").style.display =
-tab==="stats" ? "block":"none"
-
-if(tab==="stats"){
-renderStats()
-}
-
-}
-  
 function loadMonths(){
 
 let select=document.getElementById("month")
@@ -360,38 +347,6 @@ document.getElementById("date").value=new Date().toISOString().split("T")[0]
 
 updateCategories()
 render()
-function renderStats(){
-
-let table = document.getElementById("statsTable")
-
-table.innerHTML=""
-
-Object.keys(data).forEach(month=>{
-
-let income=0
-let expense=0
-
-data[month].forEach(t=>{
-if(t.type==="income") income+=t.amount
-else expense+=t.amount
-})
-
-let result = income-expense
-
-let tr=document.createElement("tr")
-
-tr.innerHTML=`
-
-<td>${month}</td>
-<td class="income">$${income}</td>
-<td class="expense">$${expense}</td>
-<td>${result>=0?"+$"+result:"-$"+Math.abs(result)}</td>
-
-`
-
-table.appendChild(tr)
-
-})
 
 }
 
