@@ -258,7 +258,6 @@ cursor:pointer;
 </div>
 
 </div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
@@ -266,18 +265,18 @@ cursor:pointer;
 
 const supabaseClient = supabase.createClient(
 "https://mhssctiyqzvycoyganct.supabase.co",
-"ТВОЙ_PUBLIC_KEY"
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1oc3NjdGl5cXp2eWNveWdhbmN0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3NDM4MTMsImV4cCI6MjA4ODMxOTgxM30.xOriQ-w57-67992R9CUkxEYnyCDJkgzUCOMWFwDxXLo"
 )
 
 let data={}
 let editIndex=null
 
 const incomeCats=[
-"💼 Работа","₿ Крипта","🎰 Лудка","📢 Реклама","🤝 Партнерки"
+"Работа","Крипта","Лудка","Реклама","Партнерки"
 ]
 
 const expenseCats=[
-"🍔 Продукты","🚗 Транспорт","🎮 Развлечения","📚 Образование","📦 Другое"
+"Продукты","Транспорт","Развлечения","Образование","Другое"
 ]
 
 function showTab(tab){
@@ -563,6 +562,7 @@ loadFromDB()
 
 </body>
 </html>
+
 
 
 
