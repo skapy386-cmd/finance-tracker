@@ -141,6 +141,18 @@ cursor:pointer;
 
 <body>
 
+<div id="authBox" style="max-width:400px;margin:40px auto;background:#1e293b;padding:20px;border-radius:12px">
+
+<h2>Вход</h2>
+
+<input id="email" placeholder="Email" style="width:100%;margin-bottom:10px;padding:10px">
+<input id="password" type="password" placeholder="Пароль" style="width:100%;margin-bottom:10px;padding:10px">
+
+<button onclick="login()" style="width:100%;margin-bottom:10px">Войти</button>
+<button onclick="signUp()" style="width:100%">Регистрация</button>
+
+</div>
+
 <div class="container">
 
 <h1>💰 Finance Tracker</h1>
@@ -261,6 +273,52 @@ cursor:pointer;
 </div>
 
 <script>
+
+const SUPABASE_URL = "https://mhssctiyqzvycoyganct.supabase.co"
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1oc3NjdGl5cXp2eWNveWdhbmN0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3NDM4MTMsImV4cCI6MjA4ODMxOTgxM30.xOriQ-w57-67992R9CUkxEYnyCDJkgzUCOMWFwDxXLo"
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+
+async function signUp(){
+
+let email=document.getElementById("email").value
+let password=document.getElementById("password").value
+
+let {error}=await supabase.auth.signUp({email,password})
+
+if(error) alert(error.message)
+else alert("Аккаунт создан")
+
+}
+
+async function login(){
+
+let email=document.getElementById("email").value
+let password=document.getElementById("password").value
+
+let {error}=await supabase.auth.signInWithPassword({email,password})
+
+if(error){
+alert(error.message)
+}else{
+location.reload()
+}
+
+}
+
+async function checkAuth(){
+
+let {data}=await supabase.auth.getSession()
+
+if(data.session){
+document.getElementById("authBox").style.display="none"
+}else{
+document.getElementById("mainTab").style.display="none"
+}
+
+}
+
+checkAuth()
 
 let data=JSON.parse(localStorage.getItem("finance"))||{}
 let editIndex=null
@@ -530,6 +588,8 @@ document.getElementById("month").addEventListener("change",render)
 loadMonths()
 
 </script>
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+</script>
 </body>
 </html>
+
