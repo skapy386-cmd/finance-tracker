@@ -261,50 +261,50 @@ cursor:pointer;
 
 <script>
 
-let data = {}
+const supabaseClient = supabase.createClient(
+"ВАШ_SUPABASE_URL",
+"ВАШ_PUBLIC_KEY"
+)
+
+let data={}
 let editIndex=null
 
 const incomeCats=[
-"💼 Работа",
-"₿ Крипта",
-"🎰 Лудка",
-"📢 Реклама",
-"🤝 Партнерки"
+"💼 Работа","₿ Крипта","🎰 Лудка","📢 Реклама","🤝 Партнерки"
 ]
 
 const expenseCats=[
-"🍔 Продукты",
-"🚗 Транспорт",
-"🎮 Развлечения",
-"📚 Образование",
-"📦 Другое"
+"🍔 Продукты","🚗 Транспорт","🎮 Развлечения","📚 Образование","📦 Другое"
 ]
 
 function updateCategories(){
-
 let type=document.getElementById("type").value
 let select=document.getElementById("category")
-
 select.innerHTML=""
-
 let cats= type==="income" ? incomeCats : expenseCats
-
 cats.forEach(c=>{
 let o=document.createElement("option")
 o.value=c
 o.textContent=c
 select.appendChild(o)
 })
-
 }
 
 function monthNow(){
 let d=new Date()
 return d.getFullYear()+"-"+(d.getMonth()+1)
 }
+
+function formatDate(date){
+if(!date)return ""
+let d=new Date(date)
+let months=["января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"]
+return d.getDate()+" "+months[d.getMonth()]
+}
+
 async function loadFromDB(){
 
-const { data: rows, error } = await supabaseClient
+const { data:rows,error } = await supabaseClient
 .from("transactions")
 .select("*")
 
@@ -313,25 +313,17 @@ console.log(error)
 return
 }
 
-data = {}
+data={}
 
 rows.forEach(t=>{
-
 if(!data[t.month]) data[t.month]=[]
-
-data[t.month].push({
-type:t.type,
-cat:t.cat,
-note:t.note,
-amount:t.amount,
-date:t.date
-})
-
+data[t.month].push(t)
 })
 
 loadMonths()
 
 }
+
 function loadMonths(){
 
 let select=document.getElementById("month")
@@ -357,7 +349,7 @@ render()
 
 }
 
-function add(){
+async function add(){
 
 let m=document.getElementById("month").value
 let type=document.getElementById("type").value
@@ -368,33 +360,40 @@ let date=document.getElementById("date").value
 
 if(!amount)return
 
-if(!data[m])data[m]=[]
-
-if(editIndex!==null){
-data[m][editIndex]={type,cat,note,amount,date}
-editIndex=null
-}else{
-data[m].unshift({type,cat,note,amount,date})
-}
-await supabaseClient
+const { error } = await supabaseClient
 .from("transactions")
-.insert([
-{
+.insert([{
 month:m,
 type:type,
 cat:cat,
 note:note,
 amount:amount,
 date:date
+}])
+
+if(error){
+console.log(error)
+return
 }
-])
 
-
+loadFromDB()
 
 document.getElementById("amount").value=""
 document.getElementById("note").value=""
 
-render()
+}
+
+async function remove(i){
+
+let m=document.getElementById("month").value
+let t=data[m][i]
+
+await supabaseClient
+.from("transactions")
+.delete()
+.eq("id",t.id)
+
+loadFromDB()
 
 }
 
@@ -415,18 +414,6 @@ editIndex=i
 
 }
 
-function remove(i){
-
-let m=document.getElementById("month").value
-
-data[m].splice(i,1)
-
-
-
-render()
-
-}
-
 function render(){
 
 let m=document.getElementById("month").value
@@ -438,7 +425,6 @@ let incomeCatsStats={}
 let expenseCatsStats={}
 
 let list=document.getElementById("list")
-
 list.innerHTML=""
 
 ;(data[m]||[]).forEach((t,i)=>{
@@ -454,18 +440,15 @@ expenseCatsStats[t.cat]=(expenseCatsStats[t.cat]||0)+t.amount
 }
 
 tr.innerHTML=`
-
 <td>${formatDate(t.date)}</td>
 <td>${t.cat}</td>
-<td>${t.note || ""}</td>
+<td>${t.note||""}</td>
 <td class="${t.type}">${t.type==="income"?"доход":"расход"}</td>
 <td class="${t.type}">$${t.amount}</td>
-
 <td class="actions">
 <button onclick="edit(${i})">✏</button>
 <button onclick="remove(${i})">🗑</button>
 </td>
-
 `
 
 list.appendChild(tr)
@@ -484,13 +467,11 @@ drawStats("expenseStats",expenseCatsStats)
 function drawStats(id,cats){
 
 let stats=document.getElementById(id)
-
 stats.innerHTML=""
 
 Object.entries(cats).forEach(([cat,sum])=>{
 
 let div=document.createElement("div")
-
 div.className="categoryRow"
 
 div.innerHTML=`
@@ -504,68 +485,10 @@ stats.appendChild(div)
 
 }
 
-function renderStats(){
-
-let table=document.getElementById("statsTable")
-
-table.innerHTML=""
-
-Object.keys(data).forEach(month=>{
-
-let income=0
-let expense=0
-
-data[month].forEach(t=>{
-if(t.type==="income") income+=t.amount
-else expense+=t.amount
-})
-
-let result=income-expense
-
-let tr=document.createElement("tr")
-
-tr.innerHTML=`
-
-<td>${month}</td>
-<td class="income">$${income}</td>
-<td class="expense">$${expense}</td>
-<td>${result>=0?"+$"+result:"-$"+Math.abs(result)}</td>
-
-`
-
-table.appendChild(tr)
-
-})
-
-}
-
-function showTab(tab){
-
-document.getElementById("mainTab").style.display=tab==="main"?"block":"none"
-document.getElementById("statsTab").style.display=tab==="stats"?"block":"none"
-
-if(tab==="stats"){
-renderStats()
-}
-
-}
-
-function formatDate(date){
-
-if(!date)return ""
-
-let d=new Date(date)
-
-let months=[
-"января","февраля","марта","апреля","мая","июня",
-"июля","августа","сентября","октября","ноября","декабря"
-]
-
-return d.getDate()+" "+months[d.getMonth()]
-
-}
-
 document.getElementById("month").addEventListener("change",render)
+
+loadFromDB()
+
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 <script src="script.js"></script>
@@ -576,6 +499,7 @@ loadFromDB();
 
 </body>
 </html>
+
 
 
 
