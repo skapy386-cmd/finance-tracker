@@ -260,11 +260,13 @@ cursor:pointer;
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
 <script>
 
 const supabaseClient = supabase.createClient(
 "https://mhssctiyqzvycoyganct.supabase.co",
-"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1oc3NjdGl5cXp2eWNveWdhbmN0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3NDM4MTMsImV4cCI6MjA4ODMxOTgxM30.xOriQ-w57-67992R9CUkxEYnyCDJkgzUCOMWFwDxXLo"
+"ТВОЙ_PUBLIC_KEY"
 )
 
 let data={}
@@ -278,29 +280,58 @@ const expenseCats=[
 "🍔 Продукты","🚗 Транспорт","🎮 Развлечения","📚 Образование","📦 Другое"
 ]
 
+function showTab(tab){
+
+document.getElementById("mainTab").style.display =
+tab==="main" ? "block":"none"
+
+document.getElementById("statsTab").style.display =
+tab==="stats" ? "block":"none"
+
+if(tab==="stats"){
+renderStats()
+}
+
+}
+
 function updateCategories(){
+
 let type=document.getElementById("type").value
 let select=document.getElementById("category")
+
 select.innerHTML=""
+
 let cats= type==="income" ? incomeCats : expenseCats
+
 cats.forEach(c=>{
 let o=document.createElement("option")
 o.value=c
 o.textContent=c
 select.appendChild(o)
 })
+
 }
 
 function monthNow(){
+
 let d=new Date()
 return d.getFullYear()+"-"+(d.getMonth()+1)
+
 }
 
 function formatDate(date){
+
 if(!date)return ""
+
 let d=new Date(date)
-let months=["января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"]
+
+let months=[
+"января","февраля","марта","апреля","мая","июня",
+"июля","августа","сентября","октября","ноября","декабря"
+]
+
 return d.getDate()+" "+months[d.getMonth()]
+
 }
 
 async function loadFromDB(){
@@ -426,6 +457,7 @@ let incomeCatsStats={}
 let expenseCatsStats={}
 
 let list=document.getElementById("list")
+
 list.innerHTML=""
 
 ;(data[m]||[]).forEach((t,i)=>{
@@ -468,11 +500,13 @@ drawStats("expenseStats",expenseCatsStats)
 function drawStats(id,cats){
 
 let stats=document.getElementById(id)
+
 stats.innerHTML=""
 
 Object.entries(cats).forEach(([cat,sum])=>{
 
 let div=document.createElement("div")
+
 div.className="categoryRow"
 
 div.innerHTML=`
@@ -486,15 +520,50 @@ stats.appendChild(div)
 
 }
 
+function renderStats(){
+
+let table=document.getElementById("statsTable")
+
+table.innerHTML=""
+
+Object.keys(data).forEach(month=>{
+
+let income=0
+let expense=0
+
+data[month].forEach(t=>{
+if(t.type==="income") income+=t.amount
+else expense+=t.amount
+})
+
+let result=income-expense
+
+let tr=document.createElement("tr")
+
+tr.innerHTML=`
+
+<td>${month}</td>
+<td class="income">$${income}</td>
+<td class="expense">$${expense}</td>
+<td>${result>=0?"+$"+result:"-$"+Math.abs(result)}</td>
+
+`
+
+table.appendChild(tr)
+
+})
+
+}
+
 document.getElementById("month").addEventListener("change",render)
 
 loadFromDB()
 
 </script>
 
-
 </body>
 </html>
+
 
 
 
