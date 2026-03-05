@@ -262,7 +262,15 @@ cursor:pointer;
 
 <script>
 
-let data=JSON.parse(localStorage.getItem("finance"))||{}
+const SUPABASE_URL="YOUR_SUPABASE_URL"
+const SUPABASE_KEY="YOUR_PUBLIC_KEY"
+
+const supabase=window.supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+)
+
+let data={}
 let editIndex=null
 
 const incomeCats=[
@@ -304,7 +312,28 @@ let d=new Date()
 return d.getFullYear()+"-"+(d.getMonth()+1)
 }
 
-function loadMonths(){
+async function loadMonths(){
+
+let {data:rows}=await supabase
+.from("transactions")
+.select("*")
+.order("id",{ascending:false})
+
+data={}
+
+rows.forEach(r=>{
+
+if(!data[r.month]) data[r.month]=[]
+
+data[r.month].push({
+type:r.type,
+cat:r.category,
+note:r.note,
+amount:r.amount,
+date:r.date
+})
+
+})
 
 let select=document.getElementById("month")
 
@@ -329,7 +358,7 @@ render()
 
 }
 
-function add(){
+async function add(){
 
 let m=document.getElementById("month").value
 let type=document.getElementById("type").value
@@ -340,50 +369,23 @@ let date=document.getElementById("date").value
 
 if(!amount)return
 
-if(!data[m])data[m]=[]
-
-if(editIndex!==null){
-data[m][editIndex]={type,cat,note,amount,date}
-editIndex=null
-}else{
-data[m].unshift({type,cat,note,amount,date})
+await supabase
+.from("transactions")
+.insert([
+{
+month:m,
+date,
+category:cat,
+note,
+type,
+amount
 }
-
-localStorage.setItem("finance",JSON.stringify(data))
+])
 
 document.getElementById("amount").value=""
 document.getElementById("note").value=""
 
-render()
-
-}
-
-function edit(i){
-
-let m=document.getElementById("month").value
-let t=data[m][i]
-
-document.getElementById("type").value=t.type
-updateCategories()
-
-document.getElementById("category").value=t.cat
-document.getElementById("note").value=t.note
-document.getElementById("amount").value=t.amount
-document.getElementById("date").value=t.date
-
-editIndex=i
-
-}
-
-function remove(i){
-
-let m=document.getElementById("month").value
-
-data[m].splice(i,1)
-
-localStorage.setItem("finance",JSON.stringify(data))
-
-render()
+loadMonths()
 
 }
 
@@ -421,10 +423,7 @@ tr.innerHTML=`
 <td class="${t.type}">${t.type==="income"?"доход":"расход"}</td>
 <td class="${t.type}">$${t.amount}</td>
 
-<td class="actions">
-<button onclick="edit(${i})">✏</button>
-<button onclick="remove(${i})">🗑</button>
-</td>
+<td class="actions"></td>
 
 `
 
@@ -527,9 +526,10 @@ return d.getDate()+" "+months[d.getMonth()]
 
 document.getElementById("month").addEventListener("change",render)
 
+updateCategories()
 loadMonths()
-
 </script>
 
 </body>
 </html>
+
