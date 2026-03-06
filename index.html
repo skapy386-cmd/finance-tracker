@@ -652,54 +652,70 @@ editIndex=i
 
 }
 
-function render(){
+function renderStats(){
 
-let m=document.getElementById("month").value
+let table=document.getElementById("statsTable")
+table.innerHTML=""
+
+Object.keys(data).forEach(month=>{
 
 let income=0
 let expense=0
 
-let incomeCatsStats={}
-let expenseCatsStats={}
+let incomeCats={}
+let expenseCats={}
 
-let list=document.getElementById("list")
-
-list.innerHTML=""
-
-;(data[m]||[]).forEach((t,i)=>{
-
-let tr=document.createElement("tr")
+data[month].forEach(t=>{
 
 if(t.type==="income"){
+
 income+=t.amount
-incomeCatsStats[t.cat]=(incomeCatsStats[t.cat]||0)+t.amount
+incomeCats[t.cat]=(incomeCats[t.cat]||0)+t.amount
+
 }else{
+
 expense+=t.amount
-expenseCatsStats[t.cat]=(expenseCatsStats[t.cat]||0)+t.amount
+expenseCats[t.cat]=(expenseCats[t.cat]||0)+t.amount
+
 }
-
-tr.innerHTML=`
-<td>${formatDate(t.date)}</td>
-<td>${t.cat}</td>
-<td>${t.note||""}</td>
-<td class="${t.type}">${t.type==="income"?"доход":"расход"}</td>
-<td class="${t.type}">$${t.amount}</td>
-<td class="actions">
-<button onclick="edit(${i})">✏</button>
-<button onclick="remove(${i})">🗑</button>
-</td>
-`
-
-list.appendChild(tr)
 
 })
 
-document.getElementById("income").textContent="$"+income
-document.getElementById("expense").textContent="$"+expense
-document.getElementById("balance").textContent="$"+(income-expense)
+let result=income-expense
 
-drawStats("incomeStats",incomeCatsStats)
-drawStats("expenseStats",expenseCatsStats)
+let tr=document.createElement("tr")
+
+let incomeHTML=""
+Object.keys(incomeCats).forEach(c=>{
+incomeHTML+=`<div style="font-size:13px">• ${c} $${incomeCats[c]}</div>`
+})
+
+let expenseHTML=""
+Object.keys(expenseCats).forEach(c=>{
+expenseHTML+=`<div style="font-size:13px">• ${c} $${expenseCats[c]}</div>`
+})
+
+tr.innerHTML=`
+
+<td>
+
+<b>${month}</b>
+
+<div class="income">Доход $${income}</div>
+${incomeHTML}
+
+<div class="expense" style="margin-top:8px">Расход $${expense}</div>
+${expenseHTML}
+
+</td>
+
+<td>${result>=0?"+$"+result:"-$"+Math.abs(result)}</td>
+
+`
+
+table.appendChild(tr)
+
+})
 
 }
 
@@ -769,6 +785,7 @@ loadFromDB()
 
 </body>
 </html>
+
 
 
 
