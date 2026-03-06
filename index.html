@@ -378,10 +378,8 @@ gap:10px;
 
 <thead>
 <tr>
-<th>Месяц</th>
-<th>Доход</th>
-<th>Расход</th>
-<th>Результат</th>
+<th>Месяц и категории</th>
+<th>Итог</th>
 </tr>
 </thead>
 
@@ -424,7 +422,69 @@ document.getElementById("statsTab").style.display =
 tab==="stats" ? "block":"none"
 
 if(tab==="stats"){
-renderStats()
+function renderStats(){
+
+let table=document.getElementById("statsTable")
+table.innerHTML=""
+
+Object.keys(data).forEach(month=>{
+
+let income=0
+let expense=0
+
+let incomeCats={}
+let expenseCats={}
+
+data[month].forEach(t=>{
+
+if(t.type==="income"){
+
+income+=t.amount
+incomeCats[t.cat]=(incomeCats[t.cat]||0)+t.amount
+
+}else{
+
+expense+=t.amount
+expenseCats[t.cat]=(expenseCats[t.cat]||0)+t.amount
+
+}
+
+})
+
+let result=income-expense
+
+let tr=document.createElement("tr")
+
+tr.innerHTML=`
+
+<td><b>${month}</b>
+
+<div style="margin-top:8px">
+
+<div class="income">Доход $${income}</div>
+
+${Object.entries(incomeCats).map(([c,s])=>`
+<div style="font-size:13px;opacity:0.8">• ${c} $${s}</div>
+`).join("")}
+
+<div class="expense" style="margin-top:8px">Расход $${expense}</div>
+
+${Object.entries(expenseCats).map(([c,s])=>`
+<div style="font-size:13px;opacity:0.8">• ${c} $${s}</div>
+`).join("")}
+
+</div>
+
+</td>
+
+<td>${result>=0?"+$"+result:"-$"+Math.abs(result)}</td>
+
+`
+
+table.appendChild(tr)
+
+})
+
 }
 
 }
@@ -706,6 +766,7 @@ loadFromDB()
 
 </body>
 </html>
+
 
 
 
