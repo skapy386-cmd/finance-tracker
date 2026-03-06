@@ -422,6 +422,51 @@ document.getElementById("statsTab").style.display =
 tab==="stats" ? "block":"none"
 
 if(tab==="stats"){
+  
+}
+
+
+  
+function updateCategories(){
+
+let type=document.getElementById("type").value
+let select=document.getElementById("category")
+
+select.innerHTML=""
+
+let cats= type==="income" ? incomeCats : expenseCats
+
+cats.forEach(c=>{
+let o=document.createElement("option")
+o.value=c
+o.textContent=c
+select.appendChild(o)
+})
+
+}
+
+function monthNow(){
+
+let d=new Date()
+return d.getFullYear()+"-"+(d.getMonth()+1)
+
+}
+
+function formatDate(date){
+
+if(!date)return ""
+
+let d=new Date(date)
+
+let months=[
+"января","февраля","марта","апреля","мая","июня",
+"июля","августа","сентября","октября","ноября","декабря"
+]
+
+return d.getDate()+" "+months[d.getMonth()]
+  
+}
+
 function renderStats(){
 
 let table=document.getElementById("statsTable")
@@ -486,49 +531,7 @@ table.appendChild(tr)
 })
 
 }
-
-}
-
-function updateCategories(){
-
-let type=document.getElementById("type").value
-let select=document.getElementById("category")
-
-select.innerHTML=""
-
-let cats= type==="income" ? incomeCats : expenseCats
-
-cats.forEach(c=>{
-let o=document.createElement("option")
-o.value=c
-o.textContent=c
-select.appendChild(o)
-})
-
-}
-
-function monthNow(){
-
-let d=new Date()
-return d.getFullYear()+"-"+(d.getMonth()+1)
-
-}
-
-function formatDate(date){
-
-if(!date)return ""
-
-let d=new Date(date)
-
-let months=[
-"января","февраля","марта","апреля","мая","июня",
-"июля","августа","сентября","октября","ноября","декабря"
-]
-
-return d.getDate()+" "+months[d.getMonth()]
-
-}
-
+  
 async function loadFromDB(){
 
 const { data:rows,error } = await supabaseClient
@@ -766,6 +769,7 @@ loadFromDB()
 
 </body>
 </html>
+
 
 
 
